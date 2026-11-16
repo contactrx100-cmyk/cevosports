@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cevosports – Your story</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;color:#fff;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{min-height:100vh;min-height:100dvh;max-width:440px;margin:0 auto;padding:max(48px,env(safe-area-inset-top)) 28px 40px;display:flex;flex-direction:column}
+.brand{font-size:12px;font-weight:700;letter-spacing:.42em;color:#fff;text-decoration:none}
+.mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding:48px 0}
+.k{font-size:15px;font-weight:700;letter-spacing:.2em;color:#8a8a8a;min-height:20px}
+h1{font-size:44px;line-height:.95;font-weight:900;letter-spacing:-.03em;margin:16px 0 28px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
+.chip{border:1px solid #444;background:#000;color:#fff;font:inherit;font-size:12px;font-weight:700;letter-spacing:.15em;padding:10px 12px;cursor:pointer}
+.chip.on{background:#fff;color:#000;border-color:#fff}
+.q{font-size:15px;font-weight:700;margin-bottom:6px}
+textarea{width:100%;height:140px;background:transparent;border:0;border-bottom:1px solid #333;color:#fff;font:inherit;font-size:17px;line-height:1.5;padding:12px 0;outline:none;resize:none;border-radius:0}
+textarea::placeholder{color:#555}
+textarea:focus{border-bottom-color:#fff}
+button.send{width:100%;margin-top:24px;background:#fff;color:#000;border:0;font:inherit;font-weight:900;font-size:15px;letter-spacing:.2em;padding:18px;cursor:pointer}
+button.send:disabled{opacity:.4}
+.err{font-size:13px;color:#ff5a5a;min-height:18px;margin-top:10px}
+.t{font-size:22px;font-weight:900}
+.s{font-size:15px;color:#8a8a8a;margin-top:8px}
+#done{display:none}
+.foot{font-size:11px;color:#555;letter-spacing:.3em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="/">CEVOSPORTS</a>
+  <div class="mid">
+    <div id="form">
+      <div class="k" id="k">&nbsp;</div>
+      <h1>WHAT ARE YOU<br>PURSUING?</h1>
+      <div class="chips" id="chips"></div>
+      <div class="q">What made you start?</div>
+      <textarea id="story" maxlength="3000" placeholder="Tell us your story."></textarea>
+      <button class="send" id="go">SEND</button>
+      <div class="err" id="err"></div>
+    </div>
+    <div id="done">
+      <div class="k" id="k2"></div>
+      <div class="t" style="margin-top:16px">Got it.</div>
+      <div class="s">Welcome to the pursuit.</div>
+    </div>
+  </div>
+  <div class="foot">PURSUIT OF GREATNESS</div>
+</div>
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbxMQEfqvAUdDhcBYq2XZXuCiNClxlY61XqAvPqdJy-t6njiA5pB15nf94_tN4kYCh9kgw/exec';
+var P = ['IRONMAN','TRIATHLON','MARATHON','RUNNING','CYCLING','GYM','OTHER'];
+var q = new URLSearchParams(location.search);
+var id = (q.get('id') || '').replace(/[^A-Za-z0-9]/g, '');
+var pick = (q.get('p') || '').toUpperCase();
+if (P.indexOf(pick) < 0) pick = '';
+var chips = document.getElementById('chips'), k = document.getElementById('k'), err = document.getElementById('err'), go = document.getElementById('go');
+var num = '';
+
+function label() { k.textContent = (num ? num + (pick ? ' · ' : '') : '') + (pick || '') || ' '; }
+function post(body) {
+  return fetch(API, { method: 'POST', body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+}
+function save(extra) {
+  var b = { action: 'story', id: id, pursuit: pick };
+  if (extra) b.story = extra;
+  return post(b).then(function (d) {
+    if (d.ok && d.num) { num = '#' + String(d.num).padStart(3, '0'); label(); }
+    return d;
+  });
+}
+
+P.forEach(function (p) {
+  var b = document.createElement('button');
+  b.className = 'chip' + (p === pick ? ' on' : '');
+  b.textContent = p;
+  b.onclick = function () {
+    pick = p;
+    [].forEach.call(chips.children, function (c) { c.classList.toggle('on', c === b); });
+    err.textContent = '';
+    label();
+    if (id) save().catch(function () {});
+  };
+  chips.appendChild(b);
+});
+
+label();
+if (id) save().catch(function () {});   // records the click from the email right away
+
+document.getElementById('story').oninput = function () { err.textContent = ''; };
+go.onclick = function () {
+  var s = document.getElementById('story').value.trim();
+  if (!id) { err.textContent = 'Open this page from your welcome email.'; return; }
+  if (!pick) { err.textContent = 'Pick what you are pursuing.'; return; }
+  if (!s) { err.textContent = 'Write a few words first.'; return; }
+  go.disabled = true; go.textContent = 'SENDING…';
+  save(s).then(function (d) {
+    if (!d.ok) throw new Error();
+    document.getElementById('k2').textContent = k.textContent;
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+  }).catch(function () {
+    err.textContent = 'Something went wrong. Try again.';
+    go.disabled = false; go.textContent = 'SEND';
+  });
+};
+</script>
+</body>
+</html>

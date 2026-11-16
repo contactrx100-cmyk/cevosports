@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cevosports – Unsubscribe</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;color:#fff;font-family:Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{min-height:100vh;min-height:100dvh;max-width:440px;margin:0 auto;padding:max(48px,env(safe-area-inset-top)) 28px 40px;display:flex;flex-direction:column}
+.brand{font-size:12px;font-weight:700;letter-spacing:.42em;color:#fff;text-decoration:none}
+.mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding:48px 0}
+h1{font-size:44px;line-height:.95;font-weight:900;letter-spacing:-.03em;margin-bottom:20px}
+.s{font-size:15px;color:#8a8a8a}
+button{width:100%;margin-top:32px;background:#fff;color:#000;border:0;font:inherit;font-weight:900;font-size:15px;letter-spacing:.2em;padding:18px;cursor:pointer}
+button:disabled{opacity:.4}
+.err{font-size:13px;color:#ff5a5a;min-height:18px;margin-top:10px}
+.foot{font-size:11px;color:#555;letter-spacing:.3em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="/">CEVOSPORTS</a>
+  <div class="mid">
+    <h1 id="h">UNSUBSCRIBE?</h1>
+    <div class="s" id="s">You won't get any more emails from Cevosports.</div>
+    <button id="go">UNSUBSCRIBE</button>
+    <div class="err" id="err"></div>
+  </div>
+  <div class="foot">PURSUIT OF GREATNESS</div>
+</div>
+<script>
+var API = 'https://script.google.com/macros/s/AKfycbxMQEfqvAUdDhcBYq2XZXuCiNClxlY61XqAvPqdJy-t6njiA5pB15nf94_tN4kYCh9kgw/exec';
+var id = (new URLSearchParams(location.search).get('id') || '').replace(/[^A-Za-z0-9]/g, '');
+var go = document.getElementById('go'), err = document.getElementById('err');
+go.onclick = function () {
+  if (!id) { err.textContent = 'Open this page from the link in your email.'; return; }
+  go.disabled = true;
+  fetch(API, { method: 'POST', body: JSON.stringify({ action: 'unsub', id: id }) })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (!d.ok) throw new Error();
+      document.getElementById('h').textContent = 'DONE.';
+      document.getElementById('s').textContent = "You're unsubscribed. No more emails.";
+      go.style.display = 'none';
+    })
+    .catch(function () { err.textContent = 'Something went wrong. Try again.'; go.disabled = false; });
+};
+</script>
+</body>
+</html>
