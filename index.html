@@ -64,7 +64,7 @@ f.addEventListener('submit', function (e) {
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (!d.ok) throw new Error(d.error || 'x');
-      document.getElementById('n').textContent = '#' + d.num;
+      document.getElementById('n').textContent = '#' + String(d.num).padStart(3, '0');
       if (d.again) document.getElementById('k').textContent = "YOU'RE ALREADY MEMBER";
       f.style.display = 'none';
       document.getElementById('done').style.display = 'block';
