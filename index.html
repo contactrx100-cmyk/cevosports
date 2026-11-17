@@ -48,6 +48,7 @@ button:disabled{opacity:.4}
       <div class="n" id="n">#</div>
       <div class="t">Welcome to the club.</div>
       <div class="s">Pursuit of greatness starts now.</div>
+      <div class="s" id="mail" style="margin-top:28px;font-size:13px;color:#666">Check your inbox. Your welcome email is on its way.</div>
     </div>
   </div>
   <div class="foot">PURSUIT OF GREATNESS</div>
@@ -65,7 +66,7 @@ f.addEventListener('submit', function (e) {
     .then(function (d) {
       if (!d.ok) throw new Error(d.error || 'x');
       document.getElementById('n').textContent = '#' + String(d.num).padStart(3, '0');
-      if (d.again) document.getElementById('k').textContent = "YOU'RE ALREADY MEMBER";
+      if (d.again) { document.getElementById('k').textContent = "YOU'RE ALREADY MEMBER"; document.getElementById('mail').style.display = 'none'; }
       f.style.display = 'none';
       document.getElementById('done').style.display = 'block';
     })
