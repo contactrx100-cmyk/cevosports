@@ -39,6 +39,7 @@ button:disabled{opacity:.4}
     <form id="f" novalidate>
       <h1>JOIN<br>THE CLUB.</h1>
       <input type="email" id="email" placeholder="Email" autocomplete="email" inputmode="email" required>
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden"><label>Leave this empty <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
       <button id="go" type="submit">JOIN THE CLUB</button>
       <div class="err" id="err"></div>
       <div class="small">You'll get emails from Cevosports. Unsubscribe anytime. <a href="/privacy" style="color:#666">Privacy</a></div>
@@ -56,11 +57,22 @@ button:disabled{opacity:.4}
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbxMQEfqvAUdDhcBYq2XZXuCiNClxlY61XqAvPqdJy-t6njiA5pB15nf94_tN4kYCh9kgw/exec';
 var f = document.getElementById('f'), go = document.getElementById('go'), err = document.getElementById('err');
+var loaded = Date.now();
 f.addEventListener('submit', function (e) {
   e.preventDefault();
   var email = document.getElementById('email').value.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Add a valid email.'; return; }
   err.textContent = ''; go.disabled = true; go.textContent = 'JOINING…';
+  // Spam trap: bots fill the hidden field or submit instantly. Show success, save nothing.
+  if (document.getElementById('website').value || Date.now() - loaded < 2000) {
+    setTimeout(function () {
+      document.getElementById('n').textContent = '#';
+      document.getElementById('mail').style.display = 'none';
+      f.style.display = 'none';
+      document.getElementById('done').style.display = 'block';
+    }, 800);
+    return;
+  }
   fetch(API, { method: 'POST', body: JSON.stringify({ email: email }) })
     .then(function (r) { return r.json(); })
     .then(function (d) {
