@@ -73,7 +73,7 @@ f.addEventListener('submit', function (e) {
     }, 800);
     return;
   }
-  fetch(API, { method: 'POST', body: JSON.stringify({ email: email }) })
+  fetch(API, { method: 'POST', body: JSON.stringify({ email: email, t: Date.now() - loaded, hp: document.getElementById('website').value }) })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (!d.ok) throw new Error(d.error || 'x');
